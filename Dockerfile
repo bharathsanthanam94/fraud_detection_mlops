@@ -1,5 +1,5 @@
-# Use Python 3.10 as the base image
-FROM python:3.10-slim
+# Use Python 3.10 slim-bullseye as the base image (smaller than slim)
+FROM python:3.10-slim-bullseye as builder
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -11,26 +11,41 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_NO_INTERACTION=1
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install system dependencies and Poetry, then clean up in a single layer
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    && curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_VERSION} \
+    && apt-get purge -y --auto-remove curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_VERSION}
+# Add Poetry to PATH
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the poetry files
+# Copy only the files needed for installation
 COPY pyproject.toml poetry.lock* ./
 
 # Install dependencies
 RUN poetry install --no-root --no-dev
 
-# Copy the rest of your application's code
-COPY . .
+# Copy only the tests and src directories
+COPY tests ./tests
+COPY src ./src
+
+# Create a new stage for the final image
+FROM python:3.10-slim-bullseye as final
+
+# Copy only the necessary files from the builder stage
+COPY --from=builder /app /app
+COPY --from=builder /opt/poetry /opt/poetry
+
+# Set the working directory
+WORKDIR /app
+
+# Set the PATH to include Poetry
+ENV PATH="/opt/poetry/bin:$PATH"
 
 # Set the default command to run your application
 CMD ["poetry", "run", "python", "src/test.py"]
