@@ -47,5 +47,8 @@ WORKDIR /app
 # Set the PATH to include Poetry
 ENV PATH="/opt/poetry/bin:$PATH"
 
-# Set the default command to run your application
+# Set the entrypoint for SageMaker
+# ENTRYPOINT ["python", "/app/src/inference.py"]
+
+# Set the default command to run your application (this will be overridden by SageMaker)
 CMD ["poetry", "run", "python", "src/test.py"]
