@@ -40,5 +40,5 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = preprocess_data("/home/bharath/fraud_detection/datasets/Synthetic_Financial_datasets_log.csv")
 
     model = train_model(X_train, X_test, y_train, y_test)
-    import ipdb;ipdb.set_trace()
+    # import ipdb;ipdb.set_trace()
     accuracy, recall, precision = evaluate_model(model, X_test, y_test)
