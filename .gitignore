@@ -1,2 +1,4 @@
 datasets/*
 model.tar.gz
+Synthetic_Financial_datasets_log.csv
+.github/workflows/main.yml.disabled

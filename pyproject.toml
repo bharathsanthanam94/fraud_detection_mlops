@@ -12,6 +12,8 @@ seaborn = "0.13.2"
 joblib = "1.4.2"
 scikit-learn = "^1.5.2"  # Adding scikit-learn as it wasn't in your pip list but is used in the code
 pandas = "2.2.3"
+fastapi = "^0.115.2"
+uvicorn = "^0.32.0"
 
 [build-system]
 requires = ["poetry-core"]

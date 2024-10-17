@@ -1,40 +1,31 @@
-name: Deploy to ECR
+name: CI Pipeline
 
 on:
- 
   push:
     branches: [ main ]
-
 jobs:
-  
-  build:
-    
-    name: Build Image
+  build-and-test:
     runs-on: ubuntu-latest
-
-   
     steps:
-
-    - name: Check out code
-      uses: actions/checkout@v2
-    
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+    - uses: actions/checkout@v2
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        fetch-depth: 0  # This ensures all history and tags are fetched
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
 
+    - name: Build Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: false
+        load: true
+        tags: myapp:test
 
-    - name: Build, tag, and push image to Amazon ECR
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: test_ml_demo
-        IMAGE_TAG: test_ml_image
+    - name: Run tests in Docker container
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker run --rm myapp:test poetry run pytest tests/test_all.py
+
+    - name: List directory contents (for debugging)
+      run: |
+        docker run --rm myapp:test ls -R

@@ -28,7 +28,7 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock* ./
 
 # Install dependencies
-RUN poetry install --no-root --no-dev
+RUN poetry install --no-root
 
 # Copy only the tests and src directories
 COPY tests ./tests
@@ -48,7 +48,7 @@ WORKDIR /app
 ENV PATH="/opt/poetry/bin:$PATH"
 
 # Set the entrypoint for SageMaker
-ENTRYPOINT ["python", "src/inference.py"]
+# ENTRYPOINT ["python", "src/inference.py"]
 
 # Set the default command to run your application (this will be overridden by SageMaker)
-# CMD ["poetry", "run", "python", "src/test.py"]
+CMD ["poetry", "run", "python", "tests/test_all.py"]

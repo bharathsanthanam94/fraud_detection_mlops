@@ -34,7 +34,9 @@ def preprocess_data(csv_path):
     return X_train, X_test, y_train, y_test
 
 if __name__ == "__main__":
-    X_train, X_test, y_train, y_test = preprocess_data("/home/bharath/fraud_detection/datasets/Synthetic_Financial_datasets_log.csv")
+    X_train, X_test, y_train, y_test = preprocess_data("/home/bharath/fraud_detection_mlops/Synthetic_Financial_datasets_log.csv")
     print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
-    # import ipdb;ipdb.set_trace()
-
+    import ipdb;ipdb.set_trace()
+    print(X_test[0])
+    print(X_test[1])
+    print(X_test[2])
